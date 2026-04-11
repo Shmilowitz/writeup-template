@@ -103,6 +103,8 @@ All writeup content goes in `README.md` using standard Markdown. The headings yo
 
 Introduce the target and the goal of the assessment.
 
+![Lightbox test image](assets/images/og-image.png)
+
 ## Reconnaissance
 
 ### Port Scanning
