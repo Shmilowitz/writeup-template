@@ -405,10 +405,9 @@
     function updateToc() {
       if (!headings.length) return;
 
-      // A heading becomes active once it crosses the top 75% of the viewport.
-      // getBoundingClientRect().top is viewport-relative: negative means above viewport,
-      // positive means below. A heading qualifies when top <= 75% of screen height.
-      const trigger = window.innerHeight * 0.75;
+      // A heading becomes active once it occupies more than 75% of the viewport —
+      // i.e. when it has risen into the top 25% of the screen.
+      const trigger = window.innerHeight * 0.25;
 
       let active = headings[0];
       for (const h of headings) {
