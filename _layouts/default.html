@@ -405,15 +405,14 @@
     function updateToc() {
       if (!headings.length) return;
 
-      // Read actual scroll-padding-top so the threshold stays in sync with CSS
-      const scrollPad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 85;
-      // getBoundingClientRect gives position relative to viewport; add scrollY for document position
-      const threshold = window.scrollY + scrollPad + 4; // +4px tolerance
+      // A heading becomes active once it crosses the top 75% of the viewport.
+      // getBoundingClientRect().top is viewport-relative: negative means above viewport,
+      // positive means below. A heading qualifies when top <= 75% of screen height.
+      const trigger = window.innerHeight * 0.75;
 
       let active = headings[0];
       for (const h of headings) {
-        const docTop = h.getBoundingClientRect().top + window.scrollY;
-        if (docTop <= threshold) active = h;
+        if (h.getBoundingClientRect().top <= trigger) active = h;
         else break;
       }
 
