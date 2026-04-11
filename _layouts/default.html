@@ -200,7 +200,49 @@
     .writeup-content ul ul li::before { content: '·'; font-size: 0.9rem; top: 0.25rem; }
     .writeup-content ol { padding-left: 1.4rem; margin: 0.75rem 0 1.2rem; }
     .writeup-content ol li { color: var(--text); font-size: 0.93rem; padding: 0.15rem 0; }
-    .writeup-content img { max-width: 100%; border: 1px solid var(--border); border-radius: var(--radius); margin: 1.2rem 0; }
+    .writeup-content img { max-width: 100%; border: 1px solid var(--border); border-radius: var(--radius); margin: 1.2rem 0; cursor: zoom-in; transition: opacity var(--transition), border-color var(--transition); }
+    .writeup-content img:hover { opacity: 0.85; border-color: var(--accent); }
+
+    /* ── LIGHTBOX ── */
+    .lightbox-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      cursor: zoom-out;
+    }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-overlay img {
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      cursor: default;
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1rem; right: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 1.2rem;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      line-height: 1;
+      transition: color var(--transition);
+    }
+    .lightbox-close:hover { color: var(--accent); }
+
+    /* ── TOC ACTIVE ── */
+    .toc a.active { color: var(--accent); }
+    .toc a.active::before { opacity: 1; }
+    .toc a.active::after { transform: scaleX(1); }
     .writeup-content hr { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
     .writeup-content .footnotes { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); }
     .writeup-content .footnotes ol li { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.3rem; }
@@ -209,12 +251,23 @@
     footer span { color: var(--accent); }
 
     @media (max-width: 1024px) { .page-body { grid-template-columns: 80fr 20fr; } .writeup-content { padding: 3rem 12% 5rem; } }
-    @media (max-width: 768px) { .page-body { grid-template-columns: 1fr; } .sidebar { display: none; } .writeup-content { padding: 2.5rem 1.5rem 4rem; } }
+    @media (max-width: 768px) {
+      html { font-size: 110%; }
+      .page-body { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .writeup-content { padding: 2rem 1.25rem 4rem; }
+      .writeup-hero { padding: 2.5rem 1.25rem 2rem; }
+      .hero-badges { gap: 0.4rem; }
+    }
     @media (max-width: 640px) {
+      html { font-size: 100%; }
+      .nav-logo .nav-author { display: none; }
       .nav-links { display: none; flex-direction: column; position: absolute; top: var(--nav-h); left: 0; right: 0; background: var(--bg2); border-bottom: 1px solid var(--border); padding: 1rem 2rem; gap: 1rem; }
       .nav-links.open { display: flex; }
       .nav-links .back-link { border-left: none; margin-left: 0; padding-left: 0; }
       .hamburger { display: flex; }
+      .writeup-content div.highlight { font-size: 0.72rem; padding: 1rem; }
+      .badge { font-size: 0.65rem; }
     }
   </style>
 </head>
@@ -264,6 +317,12 @@
     </main>
   </div>
 
+  <!-- Lightbox -->
+  <div class="lightbox-overlay" id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close">[×]</button>
+    <img id="lightboxImg" src="" alt="" />
+  </div>
+
   <footer>
     <p>Built with <span>&#10084;</span> by {{ site.author }} &mdash; <span>&copy; {{ site.time | date: "%Y" }}</span></p>
     <p style="margin-top:0.4rem;font-size:0.72rem;opacity:0.5">
@@ -272,10 +331,63 @@
   </footer>
 
   <script>
+    // ── Hamburger menu ──
     const ham = document.getElementById('hamburger');
-    const nav = document.getElementById('navLinks');
-    ham.addEventListener('click', () => { ham.classList.toggle('open'); nav.classList.toggle('open'); });
-    nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { ham.classList.remove('open'); nav.classList.remove('open'); }));
+    const navLinks = document.getElementById('navLinks');
+    ham.addEventListener('click', () => { ham.classList.toggle('open'); navLinks.classList.toggle('open'); });
+    navLinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { ham.classList.remove('open'); navLinks.classList.remove('open'); }));
+
+    // ── Lightbox ──
+    const lightbox    = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    document.querySelectorAll('.writeup-content img').forEach(img => {
+      img.addEventListener('click', () => {
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt;
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    // ── Scroll-spy TOC ──
+    const tocLinks   = Array.from(document.querySelectorAll('.toc a'));
+    const headings   = Array.from(document.querySelectorAll('.writeup-content h2[id], .writeup-content h3[id]'));
+    const navHeight  = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64;
+
+    function setActive(id) {
+      tocLinks.forEach(a => {
+        const href = a.getAttribute('href');
+        a.classList.toggle('active', href === '#' + id);
+      });
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      // Find the topmost visible heading
+      const visible = entries
+        .filter(e => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+      if (visible.length) setActive(visible[0].target.id);
+    }, {
+      rootMargin: `-${navHeight + 8}px 0px -60% 0px`,
+      threshold: 0
+    });
+
+    headings.forEach(h => observer.observe(h));
+
+    // Activate first entry on load if nothing is intersecting yet
+    if (headings.length && tocLinks.length) setActive(headings[0].id);
   </script>
 </body>
 </html>

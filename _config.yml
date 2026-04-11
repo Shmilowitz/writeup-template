@@ -5,25 +5,25 @@
 # ════════════════════════════════════════
 
 # ── Site identity ────────────────────────
-title:       "OPERATION RINGALING-DDING"
-description: "Security Assessment Report — DDING-3000 SmartBell"
-author:      "David Shmilowitz"
+title:       "YOUR WRITEUP TITLE"
+description: "Short description of this writeup / assessment"
+author:      "Your Name"
 
 # ── GitHub Pages URL config ─────────────
 # baseurl = "/YOUR-REPO-NAME"
 # url     = "https://YOUR-USERNAME.github.io"
-baseurl: "/writeup-template"
-url:     "https://shmilowitz.github.io"
+baseurl: "/your-repo-name"
+url:     "https://your-username.github.io"
 
 # ── Hero section ────────────────────────
-hero_eyebrow:  "CTF // FE Hackerakademiet"
-hero_title:    "OPERATION"
-hero_subtitle: "RINGALING-DDING"
+hero_eyebrow:  "CTF // Event Name"
+hero_title:    "YOUR"
+hero_subtitle: "WRITEUP TITLE"
 
 # ── Metadata badges ─────────────────────
-badge_target: "DDING-3000 SmartBell"
-badge_steps:  "4"
-badge_status: "Complete"
+badge_target: "target-hostname"
+badge_steps:  "0"
+badge_status: "In Progress"
 
 # ── Navigation links ────────────────────
 # Each item: { label, anchor }
@@ -44,21 +44,18 @@ toc_links:
     anchor: "#overview"
   - label: "Findings"
     anchor: "#findings"
-  - label: "U5FS Extraction"
-    anchor: "#u5fs-extraction"
+  - label: "Step One"
+    anchor: "#step-one"
     step: "01"
-  - label: "update2d"
-    anchor: "#update2d"
+  - label: "Step Two"
+    anchor: "#step-two"
     step: "02"
-  - label: "netupsrv"
-    anchor: "#netupsrv"
-    step: "03"
   - label: "Conclusion"
     anchor: "#conclusion"
 
 # ── External links ───────────────────────
-portfolio_url: "https://shmilowitz.github.io/portfolio"
-github_repo:   "Shmilowitz/writeup-template"
+portfolio_url: "https://your-username.github.io/portfolio"
+github_repo:   "your-username/your-repo-name"
 
 # ── Jekyll settings (do not change) ─────
 markdown:  kramdown
