@@ -35,6 +35,7 @@
       --text:       #ffffff;
       --text-dim:   #999;
       --border:     #222;
+      --nav-bg:     rgba(10,10,10,0.98);
       --nav-h:      64px;
       --side-bar:   0px;
       --sidebar-w:  340px;
@@ -43,6 +44,16 @@
       --font-head:  'Rajdhani', sans-serif;
       --font-mono:  'Share Tech Mono', monospace;
       --font-body:  'DM Sans', sans-serif;
+    }
+
+    [data-theme="light"] {
+      --bg:         #f4f4f4;
+      --bg2:        #eaeaea;
+      --bg3:        #e0e0e0;
+      --text:       #111111;
+      --text-dim:   #555555;
+      --border:     #cccccc;
+      --nav-bg:     rgba(244,244,244,0.98);
     }
 
     html { scroll-behavior: smooth; font-size: 130%; scroll-padding-top: calc(var(--nav-h) + 1rem); }
@@ -78,7 +89,7 @@
       position: fixed;
       top: 0; left: var(--side-bar); right: var(--side-bar);
       height: var(--nav-h);
-      background: rgba(10,10,10,0.98);
+      background: var(--nav-bg);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
       display: flex;
@@ -105,6 +116,22 @@
     .nav-links .back-link a:hover { color: #ff5252; }
     .nav-links .scripts-link a { color: var(--text); }
     .nav-links .scripts-link a::before { content: '{ } '; opacity: 1; color: var(--accent); font-size: 0.65rem; }
+
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      border-radius: 3px;
+      margin-left: 0.75rem;
+      transition: color var(--transition), border-color var(--transition), background var(--transition);
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { color: var(--accent); border-color: var(--accent); background: rgba(229,57,53,0.06); }
 
     .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
     .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); transition: var(--transition); }
@@ -189,8 +216,8 @@
     .writeup-content strong { color: var(--text); font-weight: 600; }
     .writeup-content p a, .writeup-content li a { color: var(--accent); border-bottom: 1px solid var(--accent-dim); }
     .writeup-content p a:hover, .writeup-content li a:hover { border-color: var(--accent); color: #ff5252; }
-    .writeup-content div.highlight { background: #0a0a0a; border: 1px solid #2a2a2a; border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 1.2rem 1.4rem; margin: 1.2rem 0; overflow-x: auto; position: relative; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.65; color: #ccc; }
-    .writeup-content div.highlight::before { content: 'TERMINAL'; position: absolute; top: 0; right: 0; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 2px; color: var(--accent); background: #111; padding: 2px 8px; border-left: 1px solid #2a2a2a; border-bottom: 1px solid #2a2a2a; }
+    .writeup-content div.highlight { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 1.2rem 1.4rem; margin: 1.2rem 0; overflow-x: auto; position: relative; font-family: var(--font-mono); font-size: 0.82rem; line-height: 1.65; color: var(--text-dim); }
+    .writeup-content div.highlight::before { content: 'TERMINAL'; position: absolute; top: 0; right: 0; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 2px; color: var(--accent); background: var(--bg3); padding: 2px 8px; border-left: 1px solid var(--border); border-bottom: 1px solid var(--border); }
     .writeup-content div.highlight pre { margin: 0; padding: 0; background: transparent; border: none; font-size: inherit; color: inherit; }
     .writeup-content code { font-family: var(--font-mono); font-size: 0.85em; }
     .writeup-content p code, .writeup-content li code { background: var(--bg3); border: 1px solid var(--border); padding: 1px 5px; color: var(--accent); font-size: 0.82rem; border-radius: 2px; }
@@ -212,7 +239,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.92);
+      background: rgba(0,0,0,0.88);
       z-index: 10000;
       align-items: center;
       justify-content: center;
@@ -291,7 +318,8 @@
       </li>
       <li class="back-link"><a href="{{ site.portfolio_url }}">Portfolio</a></li>
     </ul>
-    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode">[ ◑ ]</button>
+    <button class="hamburger" id="hamburger" aria-label="Toggle light/dark mode">
       <span></span><span></span><span></span>
     </button>
   </nav>
@@ -375,16 +403,19 @@
     // ── Scroll-spy TOC ──
     const tocLinks = Array.from(document.querySelectorAll('.toc a'));
     const headings = Array.from(document.querySelectorAll('.writeup-content h2[id], .writeup-content h3[id]'));
-    const NAV_OFFSET = 80; // nav height + small buffer
 
     function updateToc() {
       if (!headings.length) return;
-      const scrollY = window.scrollY + NAV_OFFSET;
 
-      // Walk backwards to find the last heading that has scrolled past the top
+      // Read actual scroll-padding-top so the threshold stays in sync with CSS
+      const scrollPad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 85;
+      // getBoundingClientRect gives position relative to viewport; add scrollY for document position
+      const threshold = window.scrollY + scrollPad + 4; // +4px tolerance
+
       let active = headings[0];
       for (const h of headings) {
-        if (h.offsetTop <= scrollY) active = h;
+        const docTop = h.getBoundingClientRect().top + window.scrollY;
+        if (docTop <= threshold) active = h;
         else break;
       }
 
@@ -392,16 +423,30 @@
         a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
       });
 
-      // Scroll the active TOC link into view within the sidebar
       const activeLink = tocLinks.find(a => a.classList.contains('active'));
-      if (activeLink) {
-        activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      }
+      if (activeLink) activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 
     window.addEventListener('scroll', updateToc, { passive: true });
-    // Run once on load
     updateToc();
+
+    // ── Theme toggle ──
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+
+    // Restore saved preference
+    if (localStorage.getItem('theme') === 'light') root.setAttribute('data-theme', 'light');
+
+    themeToggle.addEventListener('click', () => {
+      const isLight = root.getAttribute('data-theme') === 'light';
+      if (isLight) {
+        root.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        root.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+      }
+    });
   </script>
 </body>
 </html>
