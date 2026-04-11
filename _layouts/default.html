@@ -103,10 +103,8 @@
     .nav-links .back-link a { color: var(--accent); }
     .nav-links .back-link a::before { content: '← '; opacity: 1; color: var(--accent); }
     .nav-links .back-link a:hover { color: #ff5252; }
-    .nav-links .scripts-link a { color: var(--text-dim); }
-    .nav-links .scripts-link a::after { display: none; }
-    .nav-links .scripts-link a::before { content: '{ } '; opacity: 1; color: var(--accent); font-size: 0.65rem; }
-    .nav-links .scripts-link a:hover { color: var(--text); }
+    .nav-links .scripts-link a { color: var(--text); }
+    .nav-links .scripts-link a::before { content: '{ } '; opacity: 0; color: var(--accent); font-size: 0.65rem; }
 
     /* Tooltip for nav items with a data-desc */
     .nav-links a[data-desc] { position: relative; }
@@ -152,6 +150,8 @@
     .hero-badges { display: flex; flex-wrap: wrap; gap: 0.6rem; }
     .badge { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 1px; padding: 0.3rem 0.7rem; background: var(--bg2); border: 1px solid var(--border); color: var(--text); }
     .badge strong { color: var(--accent); }
+    .badge-link { text-decoration: none; transition: border-color var(--transition), color var(--transition); }
+    .badge-link:hover { border-color: var(--accent); color: var(--text); }
 
     .page-body {
       display: grid;
@@ -334,6 +334,7 @@
       <span class="badge"><strong>Steps:</strong> {{ site.badge_steps }}</span>
       <span class="badge"><strong>Author:</strong> {{ site.author }}</span>
       <span class="badge"><strong>Status:</strong> {{ site.badge_status }}</span>
+      <a class="badge badge-link" href="https://github.com/{{ site.github_repo }}/tree/main/scripts" target="_blank" rel="noopener"><strong>Scripts:</strong> github</a>
     </div>
   </header>
 
