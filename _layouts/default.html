@@ -362,32 +362,35 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
     // ── Scroll-spy TOC ──
-    const tocLinks   = Array.from(document.querySelectorAll('.toc a'));
-    const headings   = Array.from(document.querySelectorAll('.writeup-content h2[id], .writeup-content h3[id]'));
-    const navHeight  = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-h')) || 64;
+    const tocLinks = Array.from(document.querySelectorAll('.toc a'));
+    const headings = Array.from(document.querySelectorAll('.writeup-content h2[id], .writeup-content h3[id]'));
+    const NAV_OFFSET = 80; // nav height + small buffer
 
-    function setActive(id) {
+    function updateToc() {
+      if (!headings.length) return;
+      const scrollY = window.scrollY + NAV_OFFSET;
+
+      // Walk backwards to find the last heading that has scrolled past the top
+      let active = headings[0];
+      for (const h of headings) {
+        if (h.offsetTop <= scrollY) active = h;
+        else break;
+      }
+
       tocLinks.forEach(a => {
-        const href = a.getAttribute('href');
-        a.classList.toggle('active', href === '#' + id);
+        a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
       });
+
+      // Scroll the active TOC link into view within the sidebar
+      const activeLink = tocLinks.find(a => a.classList.contains('active'));
+      if (activeLink) {
+        activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
     }
 
-    const observer = new IntersectionObserver(entries => {
-      // Find the topmost visible heading
-      const visible = entries
-        .filter(e => e.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-      if (visible.length) setActive(visible[0].target.id);
-    }, {
-      rootMargin: `-${navHeight + 8}px 0px -60% 0px`,
-      threshold: 0
-    });
-
-    headings.forEach(h => observer.observe(h));
-
-    // Activate first entry on load if nothing is intersecting yet
-    if (headings.length && tocLinks.length) setActive(headings[0].id);
+    window.addEventListener('scroll', updateToc, { passive: true });
+    // Run once on load
+    updateToc();
   </script>
 </body>
 </html>
