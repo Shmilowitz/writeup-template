@@ -136,6 +136,8 @@ Describe what you found.
 > **Flag:** `FLAG{example_flag_here}`
 ```
 
+**Scripts** — place any exploit or helper scripts in the `scripts/` folder. A **Scripts** link in the navbar automatically points to that folder on GitHub, so readers can browse and download them directly. Replace `scripts/example.py` with your actual scripts.
+
 ---
 
 ### Step 6 — Enable GitHub Pages
@@ -150,6 +152,16 @@ Describe what you found.
 ### Step 7 — Update the OG image (optional)
 
 Replace `assets/images/og-image.png` with a custom 1200×630px image. This is shown when you share the link on social platforms or in messaging apps.
+
+---
+
+## Demo
+
+Click the image below to test the lightbox:
+
+![Template preview](assets/images/og-image.png)
+
+> **Scroll-spy test:** scroll up and down and watch the sidebar TOC highlight the current section.
 
 ---
 

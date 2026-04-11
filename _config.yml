@@ -7,7 +7,7 @@
 # ── Site identity ────────────────────────
 title:       "YOUR WRITEUP TITLE"
 description: "Short description of this writeup / assessment"
-author:      "Author Name"
+author:      "Your Name"
 
 # ── GitHub Pages URL config ─────────────
 # baseurl = "/YOUR-REPO-NAME"
@@ -27,31 +27,43 @@ badge_status: "In Progress"
 
 # ── Navigation links ────────────────────
 # Each item: { label, anchor }
+# The anchor must match the id Jekyll generates from your ## headings.
+# Jekyll lowercases and replaces spaces with dashes: "My Section" → "#my-section"
 nav_links:
-  - label: "Overview"
-    anchor: "#overview"
-  - label: "Findings"
-    anchor: "#findings"
-  - label: "Exploit"
-    anchor: "#exploit"
-  - label: "Conclusion"
-    anchor: "#conclusion"
+  - label: "Setup"
+    anchor: "#getting-started"
+  - label: "Demo"
+    anchor: "#demo"
+  - label: "Features"
+    anchor: "#features"
 
 # ── Sidebar TOC ─────────────────────────
 # Each item: { label, anchor, step (optional) }
 toc_links:
-  - label: "Overview"
-    anchor: "#overview"
-  - label: "Findings"
-    anchor: "#findings"
-  - label: "Step One"
-    anchor: "#step-one"
+  - label: "Getting Started"
+    anchor: "#getting-started"
+  - label: "Use Template"
+    anchor: "#step-1--use-this-template"
     step: "01"
-  - label: "Step Two"
-    anchor: "#step-two"
+  - label: "Config"
+    anchor: "#step-2--configure-_configyml"
     step: "02"
-  - label: "Conclusion"
-    anchor: "#conclusion"
+  - label: "Navigation"
+    anchor: "#step-3--set-up-the-navigation-links"
+    step: "03"
+  - label: "Sidebar TOC"
+    anchor: "#step-4--set-up-the-sidebar-table-of-contents"
+    step: "04"
+  - label: "Content"
+    anchor: "#step-5--write-your-content-in-readmemd"
+    step: "05"
+  - label: "GitHub Pages"
+    anchor: "#step-6--enable-github-pages"
+    step: "06"
+  - label: "Demo"
+    anchor: "#demo"
+  - label: "Features"
+    anchor: "#features"
 
 # ── External links ───────────────────────
 portfolio_url: "https://your-username.github.io/portfolio"

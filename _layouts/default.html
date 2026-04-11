@@ -103,6 +103,40 @@
     .nav-links .back-link a { color: var(--accent); }
     .nav-links .back-link a::before { content: '← '; opacity: 1; color: var(--accent); }
     .nav-links .back-link a:hover { color: #ff5252; }
+    .nav-links .scripts-link a { color: var(--text-dim); }
+    .nav-links .scripts-link a::after { display: none; }
+    .nav-links .scripts-link a::before { content: '{ } '; opacity: 1; color: var(--accent); font-size: 0.65rem; }
+    .nav-links .scripts-link a:hover { color: var(--text); }
+
+    /* Tooltip for nav items with a data-desc */
+    .nav-links a[data-desc] { position: relative; }
+    .nav-links a[data-desc]::after {
+      content: attr(data-desc);
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) scaleY(0);
+      transform-origin: top;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      padding: 0.35rem 0.7rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--transition), transform var(--transition);
+      z-index: 2000;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .nav-links a[data-desc]:hover::after {
+      opacity: 1;
+      transform: translateX(-50%) scaleY(1);
+      height: auto;
+      background: var(--bg2);
+    }
 
     .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
     .hamburger span { display: block; width: 24px; height: 2px; background: var(--text); transition: var(--transition); }
@@ -277,8 +311,14 @@
     <div class="nav-logo"><span>[</span>Writeup<span>]</span><span class="nav-author"> — {{ site.author }}</span></div>
     <ul class="nav-links" id="navLinks">
       {% for link in site.nav_links %}
-      <li><a href="{{ link.anchor }}">{{ link.label }}</a></li>
+      <li><a href="{{ link.url | default: link.anchor }}">{{ link.label }}</a></li>
       {% endfor %}
+      <li class="scripts-link">
+        <a href="https://github.com/{{ site.github_repo }}/tree/main/scripts"
+           target="_blank"
+           rel="noopener"
+           data-desc="Scripts used in this writeup">Scripts</a>
+      </li>
       <li class="back-link"><a href="{{ site.portfolio_url }}">Portfolio</a></li>
     </ul>
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
