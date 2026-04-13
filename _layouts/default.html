@@ -83,7 +83,38 @@
     img { max-width: 100%; display: block; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: #666; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #888; }
+
+    /* ── Scroll progress bar ── */
+    #scroll-progress {
+      position: fixed;
+      top: var(--nav-h);
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent-dim);
+      z-index: 999;
+      transition: width 0.08s linear;
+    }
+    #scroll-progress::after {
+      content: attr(data-pct);
+      position: absolute;
+      right: 0;
+      top: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      color: var(--accent);
+      background: var(--bg);
+      border: 1px solid var(--accent-dim);
+      padding: 1px 5px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    #scroll-progress.show-pct::after { opacity: 1; }
 
     nav {
       position: fixed;
@@ -302,6 +333,8 @@
 </head>
 <body>
 
+  <div id="scroll-progress"></div>
+
   <nav>
     <div class="nav-logo"><span>[</span>Writeup<span>]</span><span class="nav-author"> — {{ site.author }}</span></div>
     <ul class="nav-links" id="navLinks">
@@ -400,31 +433,49 @@
 
     // ── Scroll-spy TOC ──
     const tocLinks = Array.from(document.querySelectorAll('.toc a'));
-    const headings = Array.from(document.querySelectorAll('.writeup-content h2[id], .writeup-content h3[id]'));
+
+    // Only watch headings that have a matching TOC link — prevents gaps when minor
+    // headings (not in the TOC) scroll into view. Uses getElementById rather than
+    // querySelector so numeric IDs (e.g. #1-intro) don't cause a CSS SyntaxError.
+    const headings = tocLinks
+      .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+      .filter(Boolean);
+
+    const navEl = document.querySelector('nav');
 
     function updateToc() {
       if (!headings.length) return;
-
-      // A heading becomes active once it occupies more than 75% of the viewport —
-      // i.e. when it has risen into the top 25% of the screen.
-      const trigger = window.innerHeight * 0.25;
-
-      let active = headings[0];
-      for (const h of headings) {
-        if (h.getBoundingClientRect().top <= trigger) active = h;
-        else break;
+      // Offset exceeds scroll-padding-top (nav-h + 1rem) so a heading that was
+      // jumped-to via a TOC click registers as active rather than the one above it.
+      const offset = (navEl ? navEl.offsetHeight : 64) + 28;
+      let activeIdx = 0;
+      for (let i = 0; i < headings.length; i++) {
+        if (headings[i].getBoundingClientRect().top <= offset) activeIdx = i;
       }
-
-      tocLinks.forEach(a => {
-        a.classList.toggle('active', a.getAttribute('href') === '#' + active.id);
-      });
-
-      const activeLink = tocLinks.find(a => a.classList.contains('active'));
-      if (activeLink) activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      tocLinks.forEach((a, i) => a.classList.toggle('active', i === activeIdx));
+      tocLinks[activeIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 
     window.addEventListener('scroll', updateToc, { passive: true });
     updateToc();
+
+    // ── Scroll progress bar ──
+    const progressBar = document.getElementById('scroll-progress');
+    let pctTimeout;
+
+    function updateProgress() {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = total > 0 ? Math.round((scrolled / total) * 100) : 0;
+      progressBar.style.width = pct + '%';
+      progressBar.setAttribute('data-pct', pct + '%');
+      progressBar.classList.add('show-pct');
+      clearTimeout(pctTimeout);
+      pctTimeout = setTimeout(() => progressBar.classList.remove('show-pct'), 1200);
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
 
     // ── Theme toggle ──
     const themeToggle = document.getElementById('themeToggle');

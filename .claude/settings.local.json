@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:shmilowitz.github.io)",
+      "WebFetch(domain:github.com)",
+      "Bash(curl -s https://raw.githubusercontent.com/Shmilowitz/writeup_fe-ctf/main/_layouts/default.html)",
+      "Bash(curl -s https://raw.githubusercontent.com/Shmilowitz/writeup_fe-ctf/main/_config.yml)",
+      "Bash(curl -s \"https://shmilowitz.github.io/writeup-template/\")"
+    ]
+  }
+}
